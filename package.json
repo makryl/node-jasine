@@ -1,0 +1,21 @@
+{
+    "name": "jasine",
+    "version": "0.1.0",
+    "description": "Node.js HTTP(S) server router with JSIN support",
+    "keywords": ["http", "https", "server", "router", "jsin"],
+    "homepage": "https://github.com/Aequiternus/node-jasine",
+    "bugs": "https://github.com/Aequiternus/node-jasine/issues",
+    "license": "MPL-2.0",
+    "author": {
+        "name": "Maksim Krylosov",
+        "email": "aequitenrus@gmail.com",
+        "url": "http://aeqdev.com/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/Aequiternus/node-jasine.git"
+    },
+    "dependencies": {
+        "jsin": "~0.1.6"
+    }
+}

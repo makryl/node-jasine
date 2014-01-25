@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title><?= code ?> <?= title ?></title>
+</head>
+<body style="text-align: center">
+<h1><?= code ?> <?= title ?></h1>
+<hr>
+<p>
+    jasine/<?= jasine ?> @ node/<?= node ?>
+</body>
+</html>

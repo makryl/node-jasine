@@ -1,0 +1,11 @@
+{
+    "protocol":     "http",
+    "host":         "localhost",
+    "port":         "8008",
+    "logLevel":     "info",
+    "directory":    "./pub",
+    "error":        "./pub/",
+    "mimeDefault":  "text/html",
+    "mimeJSON":     "text/json",
+    "charset":      "UTF-8"
+}
