@@ -1,5 +1,7 @@
 # Jasine
 
+## DEVELOPEMENT VERSION, DON'T USE IT ATM.
+
 Router for Node.js's HTTP(S) server, calls JS controller and [JSIN](https://github.com/Aequiternus/node-jsin) template using URL.
 
     $ npm install jasine
