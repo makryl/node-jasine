@@ -5,7 +5,11 @@
 Router for Node.js's HTTP(S) server, calls JS controller and [JSIN](https://github.com/Aequiternus/node-jsin) template using URL.
 
     $ npm install jasine
-    $ npm start
+    $ ./node_modules/.bin/jasine [config.json]
+
+or
+    $ sudo npm install -g jasine
+    $ jasine [config.json]
 
 When you open any URL, Jasine first looks for `.js` file with same path in working directory:
 
@@ -28,13 +32,13 @@ This `.js` file should be node module exporting one function:
 
 Data object, passed in callback, will be passed to [JSIN](https://github.com/Aequiternus/node-jsin) template at same file path, but `.jsin` extension.
 
-If `.js` file wasn't found, Jasine will looks for `.jsin` file at same path, and call it without data.
+If `.js` file wasn't found, Jasine will look for `.jsin` file at same path, and call it without data.
 
-If you open URL ending with `.json` extension, Jasine will look for `.js` module at same path, and response generated data as json, without using [JSIN](https://github.com/Aequiternus/node-jsin) template.
+If you open URL ending with `.json` extension, Jasine will look for `.js` module at same path, and response generated data as JSON, without using [JSIN](https://github.com/Aequiternus/node-jsin) template.
 
     http://localhost:8008/boo.json  -> public_dir/boo.js
 
-You can pass path to config file in JSON format as argument to server start. Default config:
+Default config:
 
     {
         "protocol":     "http",

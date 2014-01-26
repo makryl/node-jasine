@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Copyright © 2014 Maksim Krylosov <Aequiternus@gmail.com>
  *
@@ -7,16 +9,17 @@
  */
 
 var config = {
-    "protocol":     "http",
-    "host":         "localhost",
-    "port":         "8008",
-    "logLevel":     "info",
-    "directory":    "./pub",
-    "error":        "./pub/",
-    "mimeDefault":  "text/html",
-    "mimeJSON":     "text/json",
-    "charset":      "UTF-8"
-}
+    protocol:       "http",
+    host:           "localhost",
+    port:           "8008",
+    socket:         "",
+    logLevel:       "info",
+    directory:      __dirname + "/pub",
+    error:          __dirname + "/pub/",
+    mimeDefault:    "text/html",
+    mimeJSON:       "text/json",
+    charset:        "UTF-8"
+};
 
 var i = 0;
 if ('node' === process.argv[i++]) {
@@ -33,8 +36,14 @@ if (process.argv[i]) {
     }
 }
 
-require(config.protocol)
-    .createServer(require('./index')(config))
-    .listen(config.port, config.host);
+var server = require(config.protocol).createServer(require('./index')(config));
+server.listen(config.port, config.host);
+
+process.on('SIGTERM', function () {
+    console.log('Closing server');
+    server.close(function() {
+        console.log('Server closed');
+    });
+});
 
 console.log('Started: ' + config.protocol + '://' + config.host + ':' + config.port);

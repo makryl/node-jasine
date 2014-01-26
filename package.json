@@ -1,6 +1,6 @@
 {
     "name": "jasine",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "HTTP(S) server router with JSIN support",
     "keywords": ["http", "https", "server", "router", "jsin"],
     "homepage": "https://github.com/Aequiternus/node-jasine",
@@ -10,6 +10,9 @@
         "name": "Maksim Krylosov",
         "email": "aequitenrus@gmail.com",
         "url": "http://aeqdev.com/"
+    },
+    "bin": {
+        "jasine": "./jasine.js"
     },
     "repository": {
         "type": "git",

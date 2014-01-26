@@ -52,16 +52,19 @@ function controller(req, res, path, json) {
     if (path.match(/(^$|\/$)/)) {
         path += 'index';
     }
+    logger.debug(req.__id, "Path: " + path);
 
     var fullPath = path;
     if (!path.match(/^\.?\//)) {
         fullPath = config.directory + '/' + fullPath;
     }
+    logger.debug(req.__id, "Module: " + fullPath);
 
     try {
         require(fullPath)(req, res, function(err, tpl, data) {
             try {
                 if (err) throw err;
+                logger.debug(req.__id, "Data received");
                 if ('undefined' === typeof data) {
                     data = tpl;
                     tpl = null;
@@ -76,7 +79,8 @@ function controller(req, res, path, json) {
             }
         });
     } catch (err) {
-        if ('MODULE_NOT_FOUND' === err.code) {
+        if ('MODULE_NOT_FOUND' === err.code && -1 !== err.message.indexOf(fullPath)) {
+            logger.debug(req.__id, "Module not found");
             if (json) {
                 notFound(req, res);
             } else {
@@ -121,9 +125,10 @@ function notFound(req, res) {
 }
 
 function template(req, res, need, path, data) {
+    logger.debug(req.__id, "JSIN: " + path);
     jsin.include(path, data || {}, function(err, out) {
         if (err) {
-            if (need || 'ENOENT' !== err.code) {
+            if (need || 'ENOENT' !== err.code || -1 === err.message.indexOf(path)) {
                 error(req, res, err);
             } else {
                 notFound(req, res);
@@ -136,12 +141,14 @@ function template(req, res, need, path, data) {
 
 function outputJSON(req, res, data) {
     res.end(JSON.stringify(data));
+    logger.debug(req.__id, "JSON output");
     logger.info(req.__id, res.statusCode + ' ' + req.url);
 }
 
 function outputJSIN(req, res, out) {
     res.end(out);
     if (!res.__hasError) {
+        logger.debug(req.__id, "JSIN output");
         logger.info(req.__id, res.statusCode + ' ' + req.url);
     }
 }
