@@ -54,7 +54,7 @@ You can pass path to config file in JSON format as argument to server start. Def
 - `error`: universal controller for all errors.
     Ending `/` means `/index` like in URL.
 - `errorXXX`: controller/template for specified error code.
-    Example: `"error404": /path/to/error404` will look for `/path/to/error404.js` and/or `/path/to/error404.jsin`.
+    Example: `"error404": "/path/to/error404"` will look for `/path/to/error404.js` and/or `/path/to/error404.jsin`.
 
 ## License
 
