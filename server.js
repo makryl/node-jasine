@@ -6,7 +6,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-var config;
+var config = {
+    "protocol":     "http",
+    "host":         "localhost",
+    "port":         "8008",
+    "logLevel":     "info",
+    "directory":    "./pub",
+    "error":        "./pub/",
+    "mimeDefault":  "text/html",
+    "mimeJSON":     "text/json",
+    "charset":      "UTF-8"
+}
 
 var i = 0;
 if ('node' === process.argv[i++]) {
@@ -17,13 +27,14 @@ if (process.argv[i]) {
     if (!optionsPath.match(/^\.?\//)) {
         optionsPath = process.cwd() + '/' + optionsPath;
     }
-    config = require(optionsPath);
-} else {
-    config = require('./config.json');
+    var cfg = require(optionsPath);
+    for (var name in cfg) {
+        config[name] = cfg[name];
+    }
 }
 
 require(config.protocol)
     .createServer(require('./index')(config))
     .listen(config.port, config.host);
 
-console.log('Started: ' + config.protocol + '://' + config.host + ':' + config.port)
+console.log('Started: ' + config.protocol + '://' + config.host + ':' + config.port);
