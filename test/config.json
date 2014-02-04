@@ -1,3 +1,4 @@
 {
-    "logLevel": "debug"
+    "logLevel": "debug",
+    "directory": "./test/pub"
 }

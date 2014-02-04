@@ -1,1 +1,11 @@
-<h1>Test <?= boo ?></h1>
+<?js layout('layout', function(){ ?>
+
+<h1>Test index <?= boo ?></h1>
+<p>
+    <a href="/foo">foo</a>
+
+<p id="check-ajax-element">
+    <?js include('check-ajax-element', {count: 0}) ?>
+</p>
+
+<?js }) ?>

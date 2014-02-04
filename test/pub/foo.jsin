@@ -1,0 +1,7 @@
+<?js layout('layout', function(){ ?>
+
+<h1>Test foo <?= foo ?></h1>
+<p>
+    <a href="/">index</a>
+
+<?js }) ?>

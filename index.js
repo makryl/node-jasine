@@ -9,6 +9,7 @@
 module.exports = create;
 
 var fs = require('fs');
+var url = require('url');
 var jsin = require('jsin');
 
 var config;
@@ -28,7 +29,7 @@ function router(req, res) {
     try {
         req.__id = ++REQID;
 
-        var path = req.url.toString().substr(1);
+        var path = url.parse(req.url).pathname.substr(1);
 
         var json = path.match(/\.json$/);
         if (json) {
