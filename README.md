@@ -8,6 +8,7 @@ Router for Node.js's HTTP(S) server, calls JS controller and [JSIN](https://gith
     $ ./node_modules/.bin/jasine [config.json]
 
 or
+
     $ sudo npm install -g jasine
     $ jasine [config.json]
 
