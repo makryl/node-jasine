@@ -8,11 +8,10 @@
 
     <?js contents() ?>
 
-<script src="/res/jasine.js"></script>
+<script src="/static/jsin.compiled.js"></script>
+<script src="/static/jasine.js"></script>
 <script>
-    jasine.init({
-        excludeLayout: ['layout']
-    });
+    jasine.init();
 </script>
 </body>
 </html>

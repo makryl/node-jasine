@@ -8,7 +8,7 @@
 
     var options = {
         element: 'body',
-        excludeLayout: null
+        excludeLayout: ['layout']
     };
 
     function init(opts) {

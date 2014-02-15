@@ -11,16 +11,37 @@ module.exports = create;
 var fs = require('fs');
 var url = require('url');
 var jsin = require('jsin');
+var mime;
 
-var config;
 var logger;
 var REQID = 0;
 
+var config = {
+    logLevel:           "info",
+    error:              __dirname + "/public/",
+    dirPublic:          __dirname + "/public",
+    dirStatic:          __dirname + "/static",
+    uriStatic:          "/static/",
+    mimeDefault:        "text/html",
+    mimeJSON:           "text/json",
+    charset:            "utf-8"
+};
+
 function create(cfg) {
-    config = cfg;
+    if (cfg) {
+        for (var name in cfg) {
+            config[name] = cfg[name];
+        }
+    }
+
+    if (config.uriStatic) {
+        mime = require('mime');
+    }
 
     logger = new (require('./logger'))(config.logLevel);
-    jsin.setDirectory(config.directory);
+
+    jsin.setDirectory(config.dirPublic);
+    jsin.clear();
 
     return router;
 }
@@ -29,7 +50,14 @@ function router(req, res) {
     try {
         req.__id = ++REQID;
 
-        var path = url.parse(req.url).pathname.substr(1);
+        var path = url.parse(req.url).pathname;
+
+        if (config.uriStatic && path.substr(0, config.uriStatic.length) === config.uriStatic) {
+            static(req, res, path.substr(config.uriStatic.length));
+            return;
+        }
+
+        path = path.substr(1);
 
         var json = path.match(/\.json$/);
         if (json) {
@@ -57,7 +85,7 @@ function controller(req, res, path, json) {
 
     var fullPath = path;
     if (!path.match(/^\.?\//)) {
-        fullPath = config.directory + '/' + fullPath;
+        fullPath = config.dirPublic + '/' + fullPath;
     }
     logger.debug(req.__id, "Module: " + fullPath);
 
@@ -152,4 +180,31 @@ function outputJSIN(req, res, out) {
         logger.debug(req.__id, "JSIN output");
         logger.info(req.__id, res.statusCode + ' ' + req.url);
     }
+}
+
+function static(req, res, path) {
+    path = config.dirStatic + '/' + path;
+    logger.debug(req.__id, "Static: " + path);
+    fs.stat(path, function(err, stats) {
+        if (err) {
+            if ('ENOENT' !== err.code || -1 === err.message.indexOf(path)) {
+                error(req, res, err);
+            } else {
+                notFound(req, res);
+            }
+        } else {
+            var ct = mime.lookup(path);
+            if (ct.match(/^text\//)) {
+                ct += '; charset=' + config.charset;
+            }
+
+            res.setHeader('Content-type', ct);
+            res.setHeader('Content-length', stats.size);
+
+            fs.createReadStream(path).pipe(res);
+
+            logger.debug(req.__id, 'Static output: ' + stats.size + ' ' + ct);
+            logger.info(req.__id, res.statusCode + ' ' + req.url);
+        }
+    });
 }

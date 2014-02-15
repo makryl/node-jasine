@@ -1,4 +1,5 @@
 {
-    "logLevel": "debug",
-    "directory": "./test/pub"
+    "dirPublic": "./test/public",
+    "dirStatic": "./test/static",
+    "logLevel": "debug"
 }
