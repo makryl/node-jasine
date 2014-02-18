@@ -9,6 +9,7 @@
 module.exports = create;
 
 var fs = require('fs');
+var http = require('http');
 var url = require('url');
 var jsin = require('jsin');
 var mime;
@@ -123,10 +124,21 @@ function controller(req, res, path, json) {
 
 function error(req, res, err, code, level) {
     if (!code) {
-        code = 500;
+        var statusCode = parseInt(err);
+        if (http.STATUS_CODES[statusCode]) {
+            code = statusCode;
+        } else if (err.statusCode) {
+            code = err.statusCode;
+        } else {
+            code = 500;
+        }
     }
     if (!level) {
-        level = "error";
+        if (404 === code) {
+            level = "warn";
+        } else {
+            level = "error";
+        }
     }
 
     logger.log(level, req.__id, code + ' ' + req.url + ' ' + err);
@@ -150,7 +162,7 @@ function error(req, res, err, code, level) {
 }
 
 function notFound(req, res) {
-    error(req, res, '', 404, "warn");
+    error(req, res, '', 404);
 }
 
 function template(req, res, need, path, data) {

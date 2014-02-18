@@ -1,4 +1,4 @@
-module.exports = function(req, res, callback) {
+module.exports = function(request, response, callback) {
     var data = {
         boo: 'boooooo'
     };

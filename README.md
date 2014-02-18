@@ -31,6 +31,12 @@ This `.js` file should be node module exporting one function:
         }
     };
 
+You can pass HTTP error code (404, 403, etc) to first argument of this function, or just throw this code.
+
+    callback(404);
+    // or
+    throw 404;
+
 Data object, passed in callback, will be passed to [JSIN](https://github.com/Aequiternus/node-jsin) template at same file path, but `.jsin` extension.
 
 If `.js` file wasn't found, Jasine will look for `.jsin` file at same path, and call it without data.
