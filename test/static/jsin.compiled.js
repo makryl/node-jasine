@@ -18,7 +18,7 @@ with(this){with(__data){
 layout('layout', function(){;
 print("\n<h1>Test foo ");
 print(foo);
-print("</h1>\n<p>\n    <a href=\"/\">index</a>\n\n");
+print("</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n\n");
 });
 }}
 };
@@ -28,7 +28,7 @@ with(this){with(__data){
 layout('layout', function(){;
 print("\n<h1>Test index ");
 print(boo);
-print("</h1>\n<p>\n    <a href=\"/foo\">foo</a>\n\n<p id=\"check-ajax-element\">\n");
+print("</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n\n<p id=\"check-ajax-element\">\n");
 include('check-ajax-element', {count: 0});
 print("</p>\n\n");
 });
@@ -40,6 +40,16 @@ with(this){with(__data){
 print("<!doctype html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Test</title>\n</head>\n<body>\n\n");
 contents();
 print("\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init();\n</script>\n</body>\n</html>\n");
+}}
+};
+
+w.jsin.compiled['boo/index'] = function() {
+with(this){with(__data){
+layout('layout', function(){;
+print("\n<h1>Check index controller</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n<p>\n    ");
+print(text);
+print("\n\n");
+});
 }}
 };
 

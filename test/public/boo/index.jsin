@@ -1,10 +1,12 @@
 <?js layout('layout', function(){ ?>
 
-<h1>Test foo <?= foo ?></h1>
+<h1>Check index controller</h1>
 <p>
     <a href="/">main</a>
     <a href="/foo">foo</a>
     <a href="/boo/">boo index</a>
     <a href="/boo/index-check">boo index-check</a>
+<p>
+    <?= text ?>
 
 <?js }) ?>

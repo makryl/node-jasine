@@ -2,7 +2,10 @@
 
 <h1>Test index <?= boo ?></h1>
 <p>
+    <a href="/">main</a>
     <a href="/foo">foo</a>
+    <a href="/boo/">boo index</a>
+    <a href="/boo/index-check">boo index-check</a>
 
 <p id="check-ajax-element">
     <?js include('check-ajax-element', {count: 0}) ?>

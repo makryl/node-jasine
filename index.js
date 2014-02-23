@@ -84,37 +84,69 @@ function controller(req, res, path, json) {
     }
     logger.debug(req.__id, "Path: " + path);
 
+    function controllerCallback(err, data) {
+        try {
+            if (err) throw err;
+            logger.debug(req.__id, "Data received");
+            if (json) {
+                outputJSON(req, res, data);
+            } else {
+                template(req, res, true, data.template || path, data);
+            }
+        } catch (err) {
+            error(req, res, err);
+        }
+    }
+
+    function noController() {
+        if (json) {
+            notFound(req, res);
+        } else {
+            template(req, res, false, path);
+        }
+    }
+
     var fullPath = path;
     if (!path.match(/^\.?\//)) {
         fullPath = config.dirPublic + '/' + fullPath;
     }
-    logger.debug(req.__id, "Module: " + fullPath);
+
+    var p = fullPath.lastIndexOf('/') + 1;
+    var dirName = fullPath.substr(0, p);
+    var baseName = fullPath.substr(p);
 
     try {
-        require(fullPath)(req, res, function(err, tpl, data) {
-            try {
-                if (err) throw err;
-                logger.debug(req.__id, "Data received");
-                if ('undefined' === typeof data) {
-                    data = tpl;
-                    tpl = null;
-                }
-                if (json) {
-                    outputJSON(req, res, data);
-                } else {
-                    template(req, res, true, tpl || path, data);
-                }
-            } catch (err) {
-                error(req, res, err);
-            }
-        });
+        var module = require(fullPath);
+        logger.debug(req.__id, "Module: " + fullPath);
+        if ('function' === typeof module) {
+            module(req, res, controllerCallback);
+        } else if ('index' === baseName && module.index) {
+            logger.debug(req.__id, "Method: index");
+            module.index(req, res, controllerCallback);
+        } else {
+            logger.debug(req.__id, "Method nod found");
+            noController();
+        }
     } catch (err) {
         if ('MODULE_NOT_FOUND' === err.code && -1 !== err.message.indexOf(fullPath)) {
-            logger.debug(req.__id, "Module not found");
-            if (json) {
-                notFound(req, res);
-            } else {
-                template(req, res, false, path);
+            fullPath = dirName + 'index';
+            try {
+                var module = require(fullPath);
+                logger.debug(req.__id, "Module: " + fullPath);
+                if (module[baseName]) {
+                    logger.debug(req.__id, "Method: " + baseName);
+                    module[baseName](req, res, controllerCallback);
+                } else {
+                    logger.debug(req.__id, "Method nod found");
+                    noController();
+                }
+            } catch (err) {
+                if ('MODULE_NOT_FOUND' === err.code && -1 !== err.message.indexOf(fullPath)) {
+                    logger.debug(req.__id, "Module not found");
+                    noController();
+                } else {
+                    throw err;
+                }
             }
         } else {
             throw err;
