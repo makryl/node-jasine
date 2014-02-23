@@ -1,5 +1,3 @@
-## DEVELOPMENT VERSION, DON'T USE IT ATM
-
 # Jasine
 
 Router for Node.js's HTTP(S) server, calls JS controller and [JSIN](https://github.com/Aequiternus/node-jsin) template using URL.
@@ -12,11 +10,11 @@ or
     $ sudo npm install -g jasine
     $ jasine [config.json]
 
-When you open any URL, Jasine first looks for `.js` file with same path in working directory:
+When you open any URL, Jasine first looks for `.js` file with same path in public directory:
 
-    http://localhost:8008/boo       -> public_dir/boo.js
-    http://localhost:8008/boo/      -> public_dir/boo/index.js
-    http://localhost:8008/          -> public_dir/index.js
+    http://localhost:8008/boo  -> public_dir/boo.js
+    http://localhost:8008/boo/ -> public_dir/boo/index.js
+    http://localhost:8008/     -> public_dir/index.js
 
 This `.js` file should be node module exporting one function:
 
@@ -39,11 +37,19 @@ You can pass HTTP error code (404, 403, etc) to first argument of this function,
 
 Data object, passed in callback, will be passed to [JSIN](https://github.com/Aequiternus/node-jsin) template at same file path, but `.jsin` extension.
 
-If `.js` file wasn't found, Jasine will look for `.jsin` file at same path, and call it without data.
+Next, Jasine will try to load `index` module in same directory and call exported method with name equal to basename of URL.
 
-If you open URL ending with `.json` extension, Jasine will look for `.js` module at same path, and response generated data as JSON, without using [JSIN](https://github.com/Aequiternus/node-jsin) template.
+For example URL `http://localhost:8008/boo`: if module `public_dir/boo.js` not found, Jasine will try to call method `boo` of module `public_dir/index.js`:
 
-    http://localhost:8008/boo.json  -> public_dir/boo.js
+    // public_dir/index.js
+    module.exports.index = function(request, response, callback) {...}
+    module.exports.boo = function(request, response, callback) {...}
+
+If method was not found, next, Jasine will look for `.jsin` file at same path (`public_dir/boo.jsin`), and call it without data.
+
+If you open URL ending with `.json` extension, Jasine will look for `.js` module or appropriate method in `index.js`, and response generated data as JSON, without using [JSIN](https://github.com/Aequiternus/node-jsin) template.
+
+    http://localhost:8008/boo.json -> public_dir/boo.js or method boo in public_dir/index.js
 
 Default config:
 
@@ -155,6 +161,8 @@ Init method adds `onclick` handler to all `a` with `href` starting with `/` and 
             using "/ajax/anotherblock.json"
         </a>
     </div>
+
+Clicking `a` with `href` starting with `/` will change history state for "back" button in browser. Clicking elements without `href` or `href` starting with `#` will not change history state. Method `jasine.init` adds `popstate` event listener of `window` to handle history "back" and "forward".
 
 Examples in `test` directory. To start test server run command:
 

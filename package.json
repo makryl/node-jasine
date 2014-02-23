@@ -1,6 +1,6 @@
 {
     "name": "jasine",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "HTTP(S) server router with JSIN support",
     "keywords": ["http", "https", "server", "router", "jsin"],
     "homepage": "https://github.com/Aequiternus/node-jasine",
