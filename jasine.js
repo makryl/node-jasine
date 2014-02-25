@@ -102,6 +102,10 @@
 
                 element.innerHTML = jsin.include(data.template || path, data);
                 initElement(element);
+
+                var evt = document.createEvent('Event');
+                evt.initEvent('elementload', true, true);
+                element.dispatchEvent(evt);
             }
         });
     }
