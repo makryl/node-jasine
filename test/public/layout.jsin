@@ -3,15 +3,29 @@
 <head>
     <meta charset="utf-8">
     <title>Test</title>
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/default.min.css">
 </head>
 <body>
 
     <?js contents() ?>
 
+<!-- Jasine -->
 <script src="/static/jsin.compiled.js"></script>
 <script src="/static/jasine.js"></script>
 <script>
     jasine.init();
 </script>
+
+<!-- Highlight.js -->
+<script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+
+    addEventListener('elementload', function(e) {
+        var blocks = e.target.querySelectorAll('pre code');
+        Array.prototype.forEach.call(blocks, hljs.highlightBlock);
+    }, false);
+</script>
+
 </body>
 </html>

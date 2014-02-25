@@ -166,7 +166,7 @@ Clicking `a` with `href` starting with `/` will change history state for "back" 
 
 Examples in `test` directory. To start test server run command:
 
-    $ npm test
+    $ npm test jasine
 
 It will prepare test templates and start test server at `http://localhost:8008/`.
 

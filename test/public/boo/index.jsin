@@ -9,4 +9,11 @@
 <p>
     <?= text ?>
 
+<h2>Controller: <code>public/boo/index.js</code></h2>
+<pre><code><?h= codeController ?></code></pre>
+<h2>Template: <code>public/boo/index.jsin</code></h2>
+<pre><code><?h= codeTemplate ?></code></pre>
+<h2>Layout: <code>public/layout.jsin</code></h2>
+<pre><code><?h= codeLayout ?></code></pre>
+
 <?js }) ?>

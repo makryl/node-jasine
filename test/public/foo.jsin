@@ -1,10 +1,19 @@
 <?js layout('layout', function(){ ?>
 
-<h1>Test foo <?= foo ?></h1>
+<h1>Test foo</h1>
 <p>
     <a href="/">main</a>
     <a href="/foo">foo</a>
     <a href="/boo/">boo index</a>
     <a href="/boo/index-check">boo index-check</a>
+<p>
+    <?h= foo ?>
+
+<h2>Controller: <code>public/foo.js</code></h2>
+<pre><code><?h= codeController ?></code></pre>
+<h2>Template: <code>public/foo.jsin</code></h2>
+<pre><code><?h= codeTemplate ?></code></pre>
+<h2>Layout: <code>public/layout.jsin</code></h2>
+<pre><code><?h= codeLayout ?></code></pre>
 
 <?js }) ?>

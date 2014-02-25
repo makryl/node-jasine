@@ -1,0 +1,10 @@
+<a href="#click-me" data-href="/click-me?count=<?= count + 1 ?>">
+    click me: <?= count ?>
+</a>
+
+<?js try { if (clickmeController && clickmeTemplate) { ?>
+    <h2>Click me controller: <code>public/click-me.js</code></h2>
+    <pre><code><?h= clickmeController ?></code></pre>
+    <h2>Click me template: <code>public/click-me.jsin</code></h2>
+    <pre><code><?h= clickmeTemplate ?></code></pre>
+<?js }} catch (err) {} ?>

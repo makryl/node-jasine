@@ -1,15 +1,14 @@
-var fs = require('fs');
+var url = require('url');
 var lib = require(__dirname + '/../lib');
 
 module.exports = function(request, response, callback) {
     var data = {
-        boo: 'boooooo'
+        count: parseInt(url.parse(request.url, true).query.count) || 0
     };
 
     lib.readCode(data, {
-        codeController: __filename,
-        codeTemplate: __dirname + '/index.jsin',
-        codeLayout: __dirname + '/layout.jsin'
+        clickmeController: __filename,
+        clickmeTemplate: __dirname + '/click-me.jsin'
     }, function(err) {
         if (err) {
             callback(err);

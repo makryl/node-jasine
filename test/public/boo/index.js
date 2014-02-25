@@ -1,9 +1,22 @@
+
+var lib = require(__dirname + '/../../lib');
+
 module.exports.index = function(request, response, callback) {
     var data = {
-        text: 'This is index method in controller',
-        template: 'boo/index'
+        text: 'This is "index" method in index controller'
     };
-    callback(null, data);
+
+    lib.readCode(data, {
+        codeController: __filename,
+        codeTemplate: __dirname + '/index.jsin',
+        codeLayout: __dirname + '/../layout.jsin'
+    }, function(err) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, data);
+        }
+    });
 };
 
 module.exports['index-check'] = function(request, response, callback) {
@@ -11,5 +24,16 @@ module.exports['index-check'] = function(request, response, callback) {
         text: 'This is "index-check" method in index controller',
         template: 'boo/index'
     };
-    callback(null, data);
+
+    lib.readCode(data, {
+        codeController: __filename,
+        codeTemplate: __dirname + '/index.jsin',
+        codeLayout: __dirname + '/../layout.jsin'
+    }, function(err) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, data);
+        }
+    });
 };

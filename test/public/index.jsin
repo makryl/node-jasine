@@ -1,14 +1,22 @@
 <?js layout('layout', function(){ ?>
 
-<h1>Test index <?= boo ?></h1>
+<h1>Test index <?h= boo ?></h1>
 <p>
     <a href="/">main</a>
     <a href="/foo">foo</a>
     <a href="/boo/">boo index</a>
     <a href="/boo/index-check">boo index-check</a>
 
-<p id="check-ajax-element">
-    <?js include('check-ajax-element', {count: 0}) ?>
+<p id="click-me">
+    <?js include('click-me', {count: 0}) ?>
 </p>
+
+<h2>Controller: <code>public/index.js</code></h2>
+<pre><code><?h= codeController ?></code></pre>
+<h2>Template: <code>public/index.jsin</code></h2>
+<pre><code><?h= codeTemplate ?></code></pre>
+<h2>Layout: <code>public/layout.jsin</code></h2>
+<pre><code><?h= codeLayout ?></code></pre>
+
 
 <?js }) ?>

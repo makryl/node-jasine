@@ -1,3 +1,0 @@
-<a href="#check-ajax-element" data-href="/check-ajax-element?count=<?= count + 1 ?>">
-    click me: <?= count ?>
-</a>

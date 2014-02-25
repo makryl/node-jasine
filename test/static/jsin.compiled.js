@@ -3,22 +3,35 @@
 
 if (!w.jsin) w.jsin = {compiled: {}};
 
-w.jsin.compiled['check-ajax-element'] = function() {
+w.jsin.compiled['click-me'] = function() {
 with(this){with(__data){
-print("<a href=\"#check-ajax-element\" data-href=\"/check-ajax-element?count=");
+print("<a href=\"#click-me\" data-href=\"/click-me?count=");
 print(count + 1);
 print("\">\n    click me: ");
 print(count);
-print("\n</a>");
+print("\n</a>\n\n");
+try { if (clickmeController && clickmeTemplate) {;
+print("    <h2>Click me controller: <code>public/click-me.js</code></h2>\n    <pre><code>");
+printh(clickmeController);
+print("</code></pre>\n    <h2>Click me template: <code>public/click-me.jsin</code></h2>\n    <pre><code>");
+printh(clickmeTemplate);
+print("</code></pre>\n");
+}} catch (err) {};
 }}
 };
 
 w.jsin.compiled['foo'] = function() {
 with(this){with(__data){
 layout('layout', function(){;
-print("\n<h1>Test foo ");
-print(foo);
-print("</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n\n");
+print("\n<h1>Test foo</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n<p>\n    ");
+printh(foo);
+print("\n\n<h2>Controller: <code>public/foo.js</code></h2>\n<pre><code>");
+printh(codeController);
+print("</code></pre>\n<h2>Template: <code>public/foo.jsin</code></h2>\n<pre><code>");
+printh(codeTemplate);
+print("</code></pre>\n<h2>Layout: <code>public/layout.jsin</code></h2>\n<pre><code>");
+printh(codeLayout);
+print("</code></pre>\n\n");
 });
 }}
 };
@@ -27,19 +40,25 @@ w.jsin.compiled['index'] = function() {
 with(this){with(__data){
 layout('layout', function(){;
 print("\n<h1>Test index ");
-print(boo);
-print("</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n\n<p id=\"check-ajax-element\">\n");
-include('check-ajax-element', {count: 0});
-print("</p>\n\n");
+printh(boo);
+print("</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n\n<p id=\"click-me\">\n");
+include('click-me', {count: 0});
+print("</p>\n\n<h2>Controller: <code>public/index.js</code></h2>\n<pre><code>");
+printh(codeController);
+print("</code></pre>\n<h2>Template: <code>public/index.jsin</code></h2>\n<pre><code>");
+printh(codeTemplate);
+print("</code></pre>\n<h2>Layout: <code>public/layout.jsin</code></h2>\n<pre><code>");
+printh(codeLayout);
+print("</code></pre>\n\n\n");
 });
 }}
 };
 
 w.jsin.compiled['layout'] = function() {
 with(this){with(__data){
-print("<!doctype html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Test</title>\n</head>\n<body>\n\n");
+print("<!doctype html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Test</title>\n    <link rel=\"stylesheet\" href=\"http://yandex.st/highlightjs/8.0/styles/default.min.css\">\n</head>\n<body>\n\n");
 contents();
-print("\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init();\n</script>\n</body>\n</html>\n");
+print("\n<!-- Jasine -->\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init();\n</script>\n\n<!-- Highlight.js -->\n<script src=\"http://yandex.st/highlightjs/8.0/highlight.min.js\"></script>\n<script>\n    hljs.initHighlightingOnLoad();\n\n    addEventListener('elementload', function(e) {\n        var blocks = e.target.querySelectorAll('pre code');\n        Array.prototype.forEach.call(blocks, hljs.highlightBlock);\n    }, false);\n</script>\n\n</body>\n</html>\n");
 }}
 };
 
@@ -48,7 +67,13 @@ with(this){with(__data){
 layout('layout', function(){;
 print("\n<h1>Check index controller</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n<p>\n    ");
 print(text);
-print("\n\n");
+print("\n\n<h2>Controller: <code>public/boo/index.js</code></h2>\n<pre><code>");
+printh(codeController);
+print("</code></pre>\n<h2>Template: <code>public/boo/index.jsin</code></h2>\n<pre><code>");
+printh(codeTemplate);
+print("</code></pre>\n<h2>Layout: <code>public/layout.jsin</code></h2>\n<pre><code>");
+printh(codeLayout);
+print("</code></pre>\n\n");
 });
 }}
 };
