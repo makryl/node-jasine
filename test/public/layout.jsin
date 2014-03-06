@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Test</title>
-    <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/default.min.css">
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/googlecode.min.css">
 </head>
 <body>
 

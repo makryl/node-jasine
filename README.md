@@ -37,6 +37,14 @@ You can pass HTTP error code (404, 403, etc) to first argument of this function,
 
 Data object, passed in callback, will be passed to [JSIN](https://github.com/Aequiternus/node-jsin) template at same file path, but `.jsin` extension.
 
+You can override template using property `template` of data object
+
+    callback(null, {
+        template: "overrided_template", // instead of URI + .jsin
+        boo: "booooo",
+        foo: "fooooo"
+    });
+
 Next, Jasine will try to load `index` module in same directory and call exported method with name equal to basename of URL.
 
 For example URL `http://localhost:8008/boo`: if module `public_dir/boo.js` not found, Jasine will try to call method `boo` of module `public_dir/index.js`:

@@ -56,7 +56,7 @@ print("</code></pre>\n\n\n");
 
 w.jsin.compiled['layout'] = function() {
 with(this){with(__data){
-print("<!doctype html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Test</title>\n    <link rel=\"stylesheet\" href=\"http://yandex.st/highlightjs/8.0/styles/default.min.css\">\n</head>\n<body>\n\n");
+print("<!doctype html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Test</title>\n    <link rel=\"stylesheet\" href=\"http://yandex.st/highlightjs/8.0/styles/googlecode.min.css\">\n</head>\n<body>\n\n");
 contents();
 print("\n<!-- Jasine -->\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init();\n</script>\n\n<!-- Highlight.js -->\n<script src=\"http://yandex.st/highlightjs/8.0/highlight.min.js\"></script>\n<script>\n    hljs.initHighlightingOnLoad();\n\n    addEventListener('elementload', function(e) {\n        var blocks = e.target.querySelectorAll('pre code');\n        Array.prototype.forEach.call(blocks, hljs.highlightBlock);\n    }, false);\n</script>\n\n</body>\n</html>\n");
 }}

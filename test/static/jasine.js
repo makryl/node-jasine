@@ -75,7 +75,6 @@
     function loadElement(element, url, postData, excludeLayout) {
         var a = document.createElement('a');
         a.href = url;
-        var hash = '#!' + a.pathname;
         var path = a.pathname.substr(1);
         if (path.match(/(^$|\/$)/)) {
             path += 'index';
