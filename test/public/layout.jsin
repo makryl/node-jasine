@@ -1,23 +1,40 @@
 <!doctype html>
 <html>
 <head>
-    <meta charset="utf-8">
     <title>Test</title>
-    <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/googlecode.min.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/adefault-light.min.css">
+    <link rel="stylesheet" href="/static/main.css">
+    <link rel="stylesheet" href="//yandex.st/highlightjs/8.0/styles/googlecode.min.css">
 </head>
 <body>
 
-    <?js contents() ?>
+    <nav>
+        <strong>Jasine test server</strong>
+        <a href="/">main</a>
+        <a href="/form">form</a>
+        <a href="/foo">foo</a>
+        <a href="/boo/">boo index</a>
+        <a href="/boo/index-check">boo index-check</a>
+    </nav>
+
+    <section>
+        <?js contents() ?>
+    </section>
 
 <!-- Jasine -->
 <script src="/static/jsin.compiled.js"></script>
 <script src="/static/jasine.js"></script>
 <script>
-    jasine.init();
+    jasine.init({
+        element: 'section'
+    });
 </script>
 
 <!-- Highlight.js -->
-<script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+<script src="//yandex.st/highlightjs/8.0/highlight.min.js"></script>
 <script>
     hljs.initHighlightingOnLoad();
 

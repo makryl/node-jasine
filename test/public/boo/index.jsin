@@ -2,11 +2,6 @@
 
 <h1>Check index controller</h1>
 <p>
-    <a href="/">main</a>
-    <a href="/foo">foo</a>
-    <a href="/boo/">boo index</a>
-    <a href="/boo/index-check">boo index-check</a>
-<p>
     <?= text ?>
 
 <h2>Controller: <code>public/boo/index.js</code></h2>

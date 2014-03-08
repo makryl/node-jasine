@@ -15,7 +15,7 @@
         for (var i in opts) {
             options[i] = opts[i];
         }
-        initElement(document.querySelector(options.element));
+        initElement(document.body);
         addEventListener('popstate', popstate, false);
 
         if (w.history && w.history.replaceState) {
@@ -30,9 +30,15 @@
     }
 
     function initElement(element) {
-        var els = element.querySelectorAll('a[href^="/"],*[data-href^="/"]');
-        for (var i = 0, l = els.length; i < l; i++) {
-            els[i].addEventListener('click', open, false);
+        var links = element.querySelectorAll('a[href^="/"],*[data-href^="/"]');
+        for (var i = 0, l = links.length; i < l; i++) {
+            links[i].addEventListener('click', open, false);
+        }
+        var forms = element.querySelectorAll('form[action^="/"],form[data-action^="/"],form:not([action])');
+        for (var i = 0, l = forms.length; i < l; i++) {
+            if (!forms[i].getAttribute('enctype')) {
+                forms[i].addEventListener('submit', submit, false);
+            }
         }
     }
 
@@ -53,7 +59,8 @@
 
         var hrefAttr = this.getAttribute('href');
         var href = this.getAttribute('data-href') || hrefAttr;
-        var elementQuery = this.getAttribute('data-element') || ('#' === hrefAttr[0] ? hrefAttr : options.element);
+        var elementQuery = this.getAttribute('data-element')
+            || (hrefAttr && '#' === hrefAttr[0] ? hrefAttr : options.element);
         var element = document.querySelector(elementQuery);
         var excludeLayout = this.getAttribute('data-exclude-layout') || options.excludeLayout;
 
@@ -68,6 +75,65 @@
                         excludeLayout: excludeLayout
                     }
                 }, document.title, href);
+            }
+        }
+    }
+
+    function submit(event) {
+        event.preventDefault();
+
+        var actionAttr = this.getAttribute('action');
+        var action = this.getAttribute('data-action') || actionAttr || location.toString();
+        var elementQuery = this.getAttribute('data-element')
+            || (actionAttr && '#' === actionAttr[0] ? actionAttr : options.element);
+        var element = document.querySelector(elementQuery);
+        var excludeLayout = this.getAttribute('data-exclude-layout') || options.excludeLayout;
+
+        var form = event.target;
+        var formElements = form.elements;
+        var data = '';
+        for (var i = 0, l = formElements.length; i < l; i++) {
+            var e = formElements[i];
+            if (!e.name && !e.id) {
+                continue;
+            }
+
+            var v = '';
+            if ('select' === e.tagName.toLowerCase()) {
+                v = e.options[e.selectedIndex].value;
+            } else if (e.type && e.type.match(/^(checkbox|radio)$/i)) {
+                if (e.checked) {
+                    v = e.value || 'on';
+                } else {
+                    continue;
+                }
+            } else {
+                v = e.value;
+            }
+
+            if (i > 0) {
+                data += '&';
+            }
+            data += encodeURIComponent(e.name || e.id) + '=' + encodeURIComponent(v);
+        }
+
+        var get = !form.method || 'get' === form.method.toLowerCase();
+        if (get) {
+            action = action.replace(/\?.*$/, '') + '?' + data;
+            data = null;
+        }
+
+        loadElement(element, action, data, excludeLayout);
+
+        if (get && (!actionAttr || '#' !== actionAttr[0])) {
+            if (w.history && w.history.pushState) {
+                history.pushState({
+                    jasine: {
+                        url: action,
+                        element: elementQuery,
+                        excludeLayout: excludeLayout
+                    }
+                }, document.title, action);
             }
         }
     }
@@ -133,7 +199,6 @@
         };
         if (postData) {
             req.open('POST', url, true);
-            req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             req.send(postData);
         } else {
             req.open('GET', url, true);

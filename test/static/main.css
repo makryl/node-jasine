@@ -1,0 +1,29 @@
+
+body {
+    max-width: 200mm;
+    margin-top: 0;
+}
+
+nav {
+    background: #404040;
+    line-height: 3em;
+    margin-bottom: 1.5em;
+    box-shadow: 0 0 1em #404040;
+}
+
+nav strong {
+    display: inline-block;
+    padding: 0 1ex 0 1.5em;
+    color: #c0c0c0;
+}
+
+nav a {
+    display: inline-block;
+    padding: 0 1ex;
+    color: #fff;
+}
+
+nav a:hover {
+    background: #c0c0c0;
+    color: #000;
+}

@@ -37,7 +37,7 @@ You can pass HTTP error code (404, 403, etc) to first argument of this function,
 
 Data object, passed in callback, will be passed to [JSIN](https://github.com/Aequiternus/node-jsin) template at same file path, but `.jsin` extension.
 
-You can override template using property `template` of data object
+You can override template using property `template` of data object:
 
     callback(null, {
         template: "overrided_template", // instead of URI + .jsin
@@ -73,7 +73,8 @@ Default config:
         "uriStatic":        "/static/",
         "mimeDefault":      "text/html",
         "mimeJSON":         "text/json",
-        "charset":          "utf-8"
+        "charset":          "utf-8",
+        "maxPostSize":      1e6
     }
 
 - `protocol`: `http`, `https`.
@@ -171,6 +172,8 @@ Init method adds `onclick` handler to all `a` with `href` starting with `/` and 
     </div>
 
 Clicking `a` with `href` starting with `/` will change history state for "back" button in browser. Clicking elements without `href` or `href` starting with `#` will not change history state. Method `jasine.init` adds `popstate` event listener of `window` to handle history "back" and "forward".
+
+AJAX forms works in same manner as links, but with `action` and `data-action` attributes instead of `href` and `data-href`. At the moment AJAX forms works only with `application/x-www-form-urlencoded`. Forms with method `get` will change history state if `action` starts with `/`. Forms with method `post` or `action` starting with `#` will not change history state.
 
 Examples in `test` directory. To start test server run command:
 

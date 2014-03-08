@@ -1,0 +1,64 @@
+<?js layout('layout', function(){ ?>
+
+<h1>Test form</h1>
+
+<h2>Method <code>GET</code></h2>
+<form>
+    <label>
+        My input
+        <input type="text" name="mygetinput" value="<?h= mygetinput ?>">
+    </label>
+    <label>
+        <input type="checkbox" name="mycheckbox"<?js if (mycheckbox) print(" checked") ?>>
+        My checkbox
+    </label>
+    <label>
+        <input type="radio" name="myradio" value="1"<?js if (myradio == 1) print(" checked") ?>>
+        My radio 1
+    </label>
+    <label>
+        <input type="radio" name="myradio" value="2"<?js if (myradio == 2) print(" checked") ?>>
+        My radio 2
+    </label>
+    <label>
+        My select
+        <select name="myselect">
+            <option value="1"<?js if (myselect == 1) print(" selected") ?>>option 1</option>
+            <option value="2"<?js if (myselect == 2) print(" selected") ?>>option 2</option>
+        </select>
+    </label>
+    <label>
+        My textarea
+        <textarea name="mytextarea"><?h= mytextarea ?></textarea>
+    </label>
+    <p>
+        <input type="submit" name="mysubmit">
+        <input type="reset">
+        <?js if (mysubmit) { ?>
+            &nbsp; You send form using method <code>GET</code>.
+        <?js } ?>
+</form>
+
+
+<h2>Method <code>POST</code></h2>
+<form method="post">
+    <label>
+        My post input
+        <input type="text" name="mypostinput" value="<?h= mypostinput ?>">
+    </label>
+    <p>
+        <input type="submit">
+        <?js if (mypostinput) { ?>
+            &nbsp; You send: "<?h= mypostinput ?>" using method <code>POST</code>.
+        <?js } ?>
+</form>
+
+
+<h2>Controller: <code>public/foo.js</code></h2>
+<pre><code><?h= codeController ?></code></pre>
+<h2>Template: <code>public/foo.jsin</code></h2>
+<pre><code><?h= codeTemplate ?></code></pre>
+<h2>Layout: <code>public/layout.jsin</code></h2>
+<pre><code><?h= codeLayout ?></code></pre>
+
+<?js }) ?>

@@ -23,9 +23,49 @@ print("</code></pre>\n");
 w.jsin.compiled['foo'] = function() {
 with(this){with(__data){
 layout('layout', function(){;
-print("\n<h1>Test foo</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n<p>\n    ");
+print("\n<h1>Test foo</h1>\n<p>\n    ");
 printh(foo);
 print("\n\n<h2>Controller: <code>public/foo.js</code></h2>\n<pre><code>");
+printh(codeController);
+print("</code></pre>\n<h2>Template: <code>public/foo.jsin</code></h2>\n<pre><code>");
+printh(codeTemplate);
+print("</code></pre>\n<h2>Layout: <code>public/layout.jsin</code></h2>\n<pre><code>");
+printh(codeLayout);
+print("</code></pre>\n\n");
+});
+}}
+};
+
+w.jsin.compiled['form'] = function() {
+with(this){with(__data){
+layout('layout', function(){;
+print("\n<h1>Test form</h1>\n\n<h2>Method <code>GET</code></h2>\n<form>\n    <label>\n        My input\n        <input type=\"text\" name=\"mygetinput\" value=\"");
+printh(mygetinput);
+print("\">\n    </label>\n    <label>\n        <input type=\"checkbox\" name=\"mycheckbox\"");
+if (mycheckbox) print("checked");
+print(">\n        My checkbox\n    </label>\n    <label>\n        <input type=\"radio\" name=\"myradio\" value=\"1\"");
+if (myradio == 1) print("checked");
+print(">\n        My radio 1\n    </label>\n    <label>\n        <input type=\"radio\" name=\"myradio\" value=\"2\"");
+if (myradio == 2) print("checked");
+print(">\n        My radio 2\n    </label>\n    <label>\n        My select\n        <select name=\"myselect\">\n            <option value=\"1\"");
+if (myselect == 1) print("selected");
+print(">option 1</option>\n            <option value=\"2\"");
+if (myselect == 2) print("selected");
+print(">option 2</option>\n        </select>\n    </label>\n    <label>\n        My textarea\n        <textarea name=\"mytextarea\">");
+printh(mytextarea);
+print("</textarea>\n    </label>\n    <p>\n        <input type=\"submit\" name=\"mysubmit\">\n        <input type=\"reset\">\n");
+if (mysubmit) {;
+print("            &nbsp; You send form using method <code>GET</code>.\n");
+};
+print("</form>\n\n\n<h2>Method <code>POST</code></h2>\n<form method=\"post\">\n    <label>\n        My post input\n        <input type=\"text\" name=\"mypostinput\" value=\"");
+printh(mypostinput);
+print("\">\n    </label>\n    <p>\n        <input type=\"submit\">\n");
+if (mypostinput) {;
+print("            &nbsp; You send: \"");
+printh(mypostinput);
+print("\" using method <code>POST</code>.\n");
+};
+print("</form>\n\n\n<h2>Controller: <code>public/foo.js</code></h2>\n<pre><code>");
 printh(codeController);
 print("</code></pre>\n<h2>Template: <code>public/foo.jsin</code></h2>\n<pre><code>");
 printh(codeTemplate);
@@ -41,7 +81,7 @@ with(this){with(__data){
 layout('layout', function(){;
 print("\n<h1>Test index ");
 printh(boo);
-print("</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n\n<p id=\"click-me\">\n");
+print("</h1>\n\n<p id=\"click-me\">\n");
 include('click-me', {count: 0});
 print("</p>\n\n<h2>Controller: <code>public/index.js</code></h2>\n<pre><code>");
 printh(codeController);
@@ -56,16 +96,16 @@ print("</code></pre>\n\n\n");
 
 w.jsin.compiled['layout'] = function() {
 with(this){with(__data){
-print("<!doctype html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Test</title>\n    <link rel=\"stylesheet\" href=\"http://yandex.st/highlightjs/8.0/styles/googlecode.min.css\">\n</head>\n<body>\n\n");
+print("<!doctype html>\n<html>\n<head>\n    <title>Test</title>\n    <meta charset=\"utf-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <link rel=\"stylesheet\" href=\"/static/adefault-light.min.css\">\n    <link rel=\"stylesheet\" href=\"/static/main.css\">\n    <link rel=\"stylesheet\" href=\"//yandex.st/highlightjs/8.0/styles/googlecode.min.css\">\n</head>\n<body>\n\n    <nav>\n        <strong>Jasine test server</strong>\n        <a href=\"/\">main</a>\n        <a href=\"/form\">form</a>\n        <a href=\"/foo\">foo</a>\n        <a href=\"/boo/\">boo index</a>\n        <a href=\"/boo/index-check\">boo index-check</a>\n    </nav>\n\n    <section>\n");
 contents();
-print("\n<!-- Jasine -->\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init();\n</script>\n\n<!-- Highlight.js -->\n<script src=\"http://yandex.st/highlightjs/8.0/highlight.min.js\"></script>\n<script>\n    hljs.initHighlightingOnLoad();\n\n    addEventListener('elementload', function(e) {\n        var blocks = e.target.querySelectorAll('pre code');\n        Array.prototype.forEach.call(blocks, hljs.highlightBlock);\n    }, false);\n</script>\n\n</body>\n</html>\n");
+print("    </section>\n\n<!-- Jasine -->\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init({\n        element: 'section'\n    });\n</script>\n\n<!-- Highlight.js -->\n<script src=\"//yandex.st/highlightjs/8.0/highlight.min.js\"></script>\n<script>\n    hljs.initHighlightingOnLoad();\n\n    addEventListener('elementload', function(e) {\n        var blocks = e.target.querySelectorAll('pre code');\n        Array.prototype.forEach.call(blocks, hljs.highlightBlock);\n    }, false);\n</script>\n\n</body>\n</html>\n");
 }}
 };
 
 w.jsin.compiled['boo/index'] = function() {
 with(this){with(__data){
 layout('layout', function(){;
-print("\n<h1>Check index controller</h1>\n<p>\n    <a href=\"/\">main</a>\n    <a href=\"/foo\">foo</a>\n    <a href=\"/boo/\">boo index</a>\n    <a href=\"/boo/index-check\">boo index-check</a>\n<p>\n    ");
+print("\n<h1>Check index controller</h1>\n<p>\n    ");
 print(text);
 print("\n\n<h2>Controller: <code>public/boo/index.js</code></h2>\n<pre><code>");
 printh(codeController);

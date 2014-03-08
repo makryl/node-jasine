@@ -91,7 +91,7 @@ function controller(req, res, path, json) {
             if (json) {
                 outputJSON(req, res, data);
             } else {
-                template(req, res, true, data.template || path, data);
+                template(req, res, data.template || path, data);
             }
         } catch (err) {
             error(req, res, err);
@@ -102,7 +102,7 @@ function controller(req, res, path, json) {
         if (json) {
             notFound(req, res);
         } else {
-            template(req, res, false, path);
+            template(req, res, path);
         }
     }
 
@@ -173,7 +173,7 @@ function error(req, res, err, code, level) {
         }
     }
 
-    logger.log(level, req.__id, code + ' ' + req.url + ' ' + err);
+    logger.log(level, req.__id, code + ' ' + req.connection.remoteAddress + ' ' + req.url + ' ' + err);
 
     res.statusCode = code;
     res.setHeader(
@@ -197,11 +197,11 @@ function notFound(req, res) {
     error(req, res, '', 404);
 }
 
-function template(req, res, need, path, data) {
+function template(req, res, path, data) {
     logger.debug(req.__id, "JSIN: " + path);
     jsin.include(path, data || {}, function(err, out) {
         if (err) {
-            if (need || 'ENOENT' !== err.code || -1 === err.message.indexOf(path)) {
+            if ('ENOENT' !== err.code || -1 === err.message.indexOf(path)) {
                 error(req, res, err);
             } else {
                 notFound(req, res);
@@ -215,14 +215,14 @@ function template(req, res, need, path, data) {
 function outputJSON(req, res, data) {
     res.end(JSON.stringify(data));
     logger.debug(req.__id, "JSON output");
-    logger.info(req.__id, res.statusCode + ' ' + req.url);
+    logger.info(req.__id, res.statusCode + ' ' + req.connection.remoteAddress + ' ' + req.url);
 }
 
 function outputJSIN(req, res, out) {
     res.end(out);
     if (!res.__hasError) {
         logger.debug(req.__id, "JSIN output");
-        logger.info(req.__id, res.statusCode + ' ' + req.url);
+        logger.info(req.__id, res.statusCode + ' ' + req.connection.remoteAddress + ' ' + req.url);
     }
 }
 
@@ -248,7 +248,7 @@ function static(req, res, path) {
             fs.createReadStream(path).pipe(res);
 
             logger.debug(req.__id, 'Static output: ' + stats.size + ' ' + ct);
-            logger.info(req.__id, res.statusCode + ' ' + req.url);
+            logger.info(req.__id, res.statusCode + ' ' + req.connection.remoteAddress + ' ' + req.url);
         }
     });
 }

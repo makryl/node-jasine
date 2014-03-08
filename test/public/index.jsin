@@ -1,11 +1,6 @@
 <?js layout('layout', function(){ ?>
 
 <h1>Test index <?h= boo ?></h1>
-<p>
-    <a href="/">main</a>
-    <a href="/foo">foo</a>
-    <a href="/boo/">boo index</a>
-    <a href="/boo/index-check">boo index-check</a>
 
 <p id="click-me">
     <?js include('click-me', {count: 0}) ?>
