@@ -173,7 +173,7 @@ function error(req, res, err, code, level) {
         }
     }
 
-    logger.log(level, req.__id, code + ' ' + req.connection.remoteAddress + ' ' + req.url + ' ' + err);
+    logger.log(level, req.__id, code + ' ' + remoteAddress(req) + ' ' + req.url + ' ' + err);
 
     res.statusCode = code;
     res.setHeader(
@@ -215,14 +215,14 @@ function template(req, res, path, data) {
 function outputJSON(req, res, data) {
     res.end(JSON.stringify(data));
     logger.debug(req.__id, "JSON output");
-    logger.info(req.__id, res.statusCode + ' ' + req.connection.remoteAddress + ' ' + req.url);
+    logger.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
 }
 
 function outputJSIN(req, res, out) {
     res.end(out);
     if (!res.__hasError) {
         logger.debug(req.__id, "JSIN output");
-        logger.info(req.__id, res.statusCode + ' ' + req.connection.remoteAddress + ' ' + req.url);
+        logger.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
     }
 }
 
@@ -248,7 +248,12 @@ function static(req, res, path) {
             fs.createReadStream(path).pipe(res);
 
             logger.debug(req.__id, 'Static output: ' + stats.size + ' ' + ct);
-            logger.info(req.__id, res.statusCode + ' ' + req.connection.remoteAddress + ' ' + req.url);
+            logger.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
         }
     });
+}
+
+function remoteAddress(req) {
+    return req.headers['x-forwarded-for']
+        || req.connection.remoteAddress;
 }
