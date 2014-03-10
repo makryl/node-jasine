@@ -76,6 +76,14 @@ print("</code></pre>\n\n");
 }}
 };
 
+w.jsin.compiled['layout'] = function() {
+with(this){with(__data){
+print("<!doctype html>\n<html>\n<head>\n    <title>Test</title>\n    <meta charset=\"utf-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <link rel=\"stylesheet\" href=\"/static/adefault-light.min.css\">\n    <link rel=\"stylesheet\" href=\"/static/main.css\">\n    <link rel=\"stylesheet\" href=\"//yandex.st/highlightjs/8.0/styles/googlecode.min.css\">\n</head>\n<body>\n\n    <nav>\n        <strong>Jasine test server</strong>\n        <a href=\"/\">main</a>\n        <a href=\"/form\">form</a>\n        <a href=\"/foo\">foo</a>\n        <a href=\"/boo/\">boo index</a>\n        <a href=\"/boo/index-check\">boo index-check</a>\n    </nav>\n\n    <section>\n");
+contents();
+print("    </section>\n\n<!-- Jasine -->\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init({\n        element: 'section'\n    });\n</script>\n\n<!-- Highlight.js -->\n<script src=\"//yandex.st/highlightjs/8.0/highlight.min.js\"></script>\n<script>\n    hljs.initHighlightingOnLoad();\n\n    addEventListener('elementload', function(e) {\n        var blocks = e.target.querySelectorAll('pre code');\n        Array.prototype.forEach.call(blocks, hljs.highlightBlock);\n    }, false);\n</script>\n\n</body>\n</html>\n");
+}}
+};
+
 w.jsin.compiled['index'] = function() {
 with(this){with(__data){
 layout('layout', function(){;
@@ -91,14 +99,6 @@ print("</code></pre>\n<h2>Layout: <code>public/layout.jsin</code></h2>\n<pre><co
 printh(codeLayout);
 print("</code></pre>\n\n\n");
 });
-}}
-};
-
-w.jsin.compiled['layout'] = function() {
-with(this){with(__data){
-print("<!doctype html>\n<html>\n<head>\n    <title>Test</title>\n    <meta charset=\"utf-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <link rel=\"stylesheet\" href=\"/static/adefault-light.min.css\">\n    <link rel=\"stylesheet\" href=\"/static/main.css\">\n    <link rel=\"stylesheet\" href=\"//yandex.st/highlightjs/8.0/styles/googlecode.min.css\">\n</head>\n<body>\n\n    <nav>\n        <strong>Jasine test server</strong>\n        <a href=\"/\">main</a>\n        <a href=\"/form\">form</a>\n        <a href=\"/foo\">foo</a>\n        <a href=\"/boo/\">boo index</a>\n        <a href=\"/boo/index-check\">boo index-check</a>\n    </nav>\n\n    <section>\n");
-contents();
-print("    </section>\n\n<!-- Jasine -->\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init({\n        element: 'section'\n    });\n</script>\n\n<!-- Highlight.js -->\n<script src=\"//yandex.st/highlightjs/8.0/highlight.min.js\"></script>\n<script>\n    hljs.initHighlightingOnLoad();\n\n    addEventListener('elementload', function(e) {\n        var blocks = e.target.querySelectorAll('pre code');\n        Array.prototype.forEach.call(blocks, hljs.highlightBlock);\n    }, false);\n</script>\n\n</body>\n</html>\n");
 }}
 };
 

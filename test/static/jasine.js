@@ -2,7 +2,8 @@
 
     if (!w.jasine) {
         w.jasine = {
-            init: init
+            init: init,
+            load: load
         };
     }
 
@@ -47,7 +48,7 @@
             var j = event.state.jasine;
             var element = document.querySelector(j.element);
             if (element) {
-                loadElement(element, j.url, null, j.excludeLayout);
+                load(element, j.url, null, j.excludeLayout);
             } else {
                 location.reload();
             }
@@ -64,7 +65,7 @@
         var element = document.querySelector(elementQuery);
         var excludeLayout = this.getAttribute('data-exclude-layout') || options.excludeLayout;
 
-        loadElement(element, href, null, excludeLayout);
+        load(element, href, null, excludeLayout);
 
         if (hrefAttr && '#' !== hrefAttr[0]) {
             if (w.history && w.history.pushState) {
@@ -123,7 +124,7 @@
             data = null;
         }
 
-        loadElement(element, action, data, excludeLayout);
+        load(element, action, data, excludeLayout);
 
         if (get && (!actionAttr || '#' !== actionAttr[0])) {
             if (w.history && w.history.pushState) {
@@ -138,7 +139,7 @@
         }
     }
 
-    function loadElement(element, url, postData, excludeLayout) {
+    function load(element, url, postData, excludeLayout) {
         var a = document.createElement('a');
         a.href = url;
         var path = a.pathname.substr(1);
@@ -147,10 +148,12 @@
             a.pathname += 'index';
         }
         a.pathname += '.json';
-        load(a.href, postData, function(err, req) {
+        fire(element, 'elementbeforeload', true, true);
+        request(a.href, postData, function(err, req) {
             if (err) {
                 console.error(req);
                 console.error(err);
+                fire(element, 'error', true, true);
             } else {
                 var data = JSON.parse(req.responseText);
                 if (excludeLayout) {
@@ -167,15 +170,12 @@
 
                 element.innerHTML = jsin.include(data.template || path, data);
                 initElement(element);
-
-                var evt = document.createEvent('Event');
-                evt.initEvent('elementload', true, true);
-                element.dispatchEvent(evt);
+                fire(element, 'elementload', true, true);
             }
         });
     }
 
-    function load(url, postData, callback) {
+    function request(url, postData, callback) {
         console.info(url);
 
         if ('function' === typeof postData) {
@@ -204,6 +204,12 @@
             req.open('GET', url, true);
             req.send();
         }
+    }
+
+    function fire(target, event, bubbles, cancelable) {
+        var evt = document.createEvent('Event');
+        evt.initEvent(event, bubbles, cancelable);
+        target.dispatchEvent(evt);
     }
 
 })(window);

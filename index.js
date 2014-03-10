@@ -176,10 +176,12 @@ function error(req, res, err, code, level) {
     logger.log(level, req.__id, code + ' ' + remoteAddress(req) + ' ' + req.url + ' ' + err);
 
     res.statusCode = code;
-    res.setHeader(
-        'Content-type',
-        config.mimeDefault + '; charset=' + config.charset
-    );
+    if (!res.headersSent) {
+        res.setHeader(
+            'Content-type',
+            config.mimeDefault + '; charset=' + config.charset
+        );
+    }
 
     if (res.__hasError) {
         res.end();
