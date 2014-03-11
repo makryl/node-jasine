@@ -71,7 +71,7 @@
             if (w.history && w.history.pushState) {
                 history.pushState({
                     jasine: {
-                        url: href,
+                        url: hrefAttr,
                         element: elementQuery,
                         excludeLayout: excludeLayout
                     }
@@ -151,9 +151,10 @@
         fire(element, 'elementbeforeload', true, true);
         request(a.href, postData, function(err, req) {
             if (err) {
-                console.error(req);
-                console.error(err);
-                fire(element, 'error', true, true);
+                fire(element, 'elementloaderror', true, true, {
+                    request: req,
+                    error: err
+                });
             } else {
                 var data = JSON.parse(req.responseText);
                 if (excludeLayout) {
@@ -170,14 +171,12 @@
 
                 element.innerHTML = jsin.include(data.template || path, data);
                 initElement(element);
-                fire(element, 'elementload', true, true);
+                fire(element, 'elementload', true, true, {request: req});
             }
         });
     }
 
     function request(url, postData, callback) {
-        console.info(url);
-
         if ('function' === typeof postData) {
             callback = postData;
             postData = null;
@@ -206,9 +205,14 @@
         }
     }
 
-    function fire(target, event, bubbles, cancelable) {
+    function fire(target, event, bubbles, cancelable, opts) {
         var evt = document.createEvent('Event');
         evt.initEvent(event, bubbles, cancelable);
+        if (opts) {
+            for (var i in opts) {
+                evt[i] = opts[i];
+            }
+        }
         target.dispatchEvent(evt);
     }
 
