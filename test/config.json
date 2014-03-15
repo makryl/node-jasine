@@ -1,5 +1,5 @@
 {
-    "dirPublic": "./test/public",
-    "dirStatic": "./test/static",
+    "dirPublic": "test/public",
+    "dirStatic": "test/static",
     "logLevel": "debug"
 }

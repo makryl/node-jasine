@@ -3,6 +3,23 @@
 
 if (!w.jsin) w.jsin = {compiled: {}};
 
+w.jsin.compiled['click-me'] = function() {
+with(this){with(__data){
+print("<a href=\"#click-me\" data-href=\"/click-me?count=");
+print(count + 1);
+print("\">\n    click me: ");
+print(count);
+print("\n</a>\n\n");
+try { if (clickmeController && clickmeTemplate) {;
+print("    <h2>Click me controller: <code>public/click-me.js</code></h2>\n    <pre><code>");
+printh(clickmeController);
+print("</code></pre>\n    <h2>Click me template: <code>public/click-me.jsin</code></h2>\n    <pre><code>");
+printh(clickmeTemplate);
+print("</code></pre>\n");
+}} catch (err) {};
+}}
+};
+
 w.jsin.compiled['foo'] = function() {
 with(this){with(__data){
 layout('layout', function(){;
@@ -59,6 +76,24 @@ print("</code></pre>\n\n");
 }}
 };
 
+w.jsin.compiled['index'] = function() {
+with(this){with(__data){
+layout('layout', function(){;
+print("\n<h1>Test index ");
+printh(boo);
+print("</h1>\n\n<p id=\"click-me\">\n");
+include('click-me', {count: 0});
+print("</p>\n\n<h2>Controller: <code>public/index.js</code></h2>\n<pre><code>");
+printh(codeController);
+print("</code></pre>\n<h2>Template: <code>public/index.jsin</code></h2>\n<pre><code>");
+printh(codeTemplate);
+print("</code></pre>\n<h2>Layout: <code>public/layout.jsin</code></h2>\n<pre><code>");
+printh(codeLayout);
+print("</code></pre>\n\n\n");
+});
+}}
+};
+
 w.jsin.compiled['layout'] = function() {
 with(this){with(__data){
 print("<!doctype html>\n<html>\n<head>\n    <title>Test</title>\n    <meta charset=\"utf-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <link rel=\"stylesheet\" href=\"/static/adefault-light.min.css\">\n    <link rel=\"stylesheet\" href=\"/static/main.css\">\n    <link rel=\"stylesheet\" href=\"//yandex.st/highlightjs/8.0/styles/googlecode.min.css\">\n</head>\n<body>\n\n    <nav>\n        <strong>Jasine test server</strong>\n        <a href=\"/\">main</a>\n        <a href=\"/form\">form</a>\n        <a href=\"/foo\">foo</a>\n        <a href=\"/boo/\">boo index</a>\n        <a href=\"/boo/index-check\">boo index-check</a>\n        <a href=\"/error\">error</a>\n    </nav>\n\n    <section>\n");
@@ -79,41 +114,6 @@ printh(codeTemplate);
 print("</code></pre>\n<h2>Layout: <code>public/layout.jsin</code></h2>\n<pre><code>");
 printh(codeLayout);
 print("</code></pre>\n\n");
-});
-}}
-};
-
-w.jsin.compiled['click-me'] = function() {
-with(this){with(__data){
-print("<a href=\"#click-me\" data-href=\"/click-me?count=");
-print(count + 1);
-print("\">\n    click me: ");
-print(count);
-print("\n</a>\n\n");
-try { if (clickmeController && clickmeTemplate) {;
-print("    <h2>Click me controller: <code>public/click-me.js</code></h2>\n    <pre><code>");
-printh(clickmeController);
-print("</code></pre>\n    <h2>Click me template: <code>public/click-me.jsin</code></h2>\n    <pre><code>");
-printh(clickmeTemplate);
-print("</code></pre>\n");
-}} catch (err) {};
-}}
-};
-
-w.jsin.compiled['index'] = function() {
-with(this){with(__data){
-layout('layout', function(){;
-print("\n<h1>Test index ");
-printh(boo);
-print("</h1>\n\n<p id=\"click-me\">\n");
-include('click-me', {count: 0});
-print("</p>\n\n<h2>Controller: <code>public/index.js</code></h2>\n<pre><code>");
-printh(codeController);
-print("</code></pre>\n<h2>Template: <code>public/index.jsin</code></h2>\n<pre><code>");
-printh(codeTemplate);
-print("</code></pre>\n<h2>Layout: <code>public/layout.jsin</code></h2>\n<pre><code>");
-printh(codeLayout);
-print("</code></pre>\n\n\n");
 });
 }}
 };

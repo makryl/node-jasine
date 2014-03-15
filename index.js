@@ -31,6 +31,9 @@ var config = {
 function create(cfg) {
     if (cfg) {
         for (var name in cfg) {
+            if (name.match(/^(dir|error)/) && !cfg[name].match(/^\.?\//)) {
+                cfg[name] = process.cwd() + '/' + cfg[name];
+            }
             config[name] = cfg[name];
         }
     }
