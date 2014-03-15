@@ -21,11 +21,9 @@
 
         if (w.history && w.history.replaceState) {
             history.replaceState({
-                jasine: {
-                    url: location.toString(),
-                    element: options.element,
-                    excludeLayout: options.excludeLayout
-                }
+                url: location.toString(),
+                element: options.element,
+                excludeLayout: options.excludeLayout
             }, document.title, location);
         }
     }
@@ -44,12 +42,14 @@
     }
 
     function popstate(event) {
-        if (event.state && event.state.jasine) {
-            var j = event.state.jasine;
-            var element = document.querySelector(j.element);
-            if (element) {
-                load(element, j.url, null, j.excludeLayout);
-            } else {
+        if (event.state) {
+            // avoid history duplicate: remove opts.url
+            var opts = event.state;
+            if (!opts.dataUrl) {
+                opts.dataUrl = opts.url;
+            }
+            opts.url = null;
+            if (!load(opts)) {
                 location.reload();
             }
         }
@@ -57,44 +57,16 @@
 
     function open(event) {
         event.preventDefault();
-
-        var hrefAttr = this.getAttribute('href');
-        var href = this.getAttribute('data-href') || hrefAttr;
-        var elementQuery = this.getAttribute('data-element')
-            || (hrefAttr && '#' === hrefAttr[0] ? hrefAttr : options.element);
-        var element = document.querySelector(elementQuery);
-        var excludeLayout = this.getAttribute('data-exclude-layout') || options.excludeLayout;
-
-        load(element, href, null, excludeLayout);
-
-        if (hrefAttr && '#' !== hrefAttr[0]) {
-            if (w.history && w.history.pushState) {
-                history.pushState({
-                    jasine: {
-                        url: hrefAttr,
-                        element: elementQuery,
-                        excludeLayout: excludeLayout
-                    }
-                }, document.title, href);
-            }
-        }
+        return load(elementOpts(this));
     }
 
     function submit(event) {
         event.preventDefault();
+        var opts = elementOpts(this);
 
-        var actionAttr = this.getAttribute('action');
-        var action = this.getAttribute('data-action') || actionAttr || location.toString();
-        var elementQuery = this.getAttribute('data-element')
-            || (actionAttr && '#' === actionAttr[0] ? actionAttr : options.element);
-        var element = document.querySelector(elementQuery);
-        var excludeLayout = this.getAttribute('data-exclude-layout') || options.excludeLayout;
-
-        var form = event.target;
-        var formElements = form.elements;
-        var data = '';
-        for (var i = 0, l = formElements.length; i < l; i++) {
-            var e = formElements[i];
+        var query = '';
+        for (var i = 0, l = this.elements.length; i < l; i++) {
+            var e = this.elements[i];
             if (!e.name && !e.id) {
                 continue;
             }
@@ -113,50 +85,63 @@
             }
 
             if (i > 0) {
-                data += '&';
+                query += '&';
             }
-            data += encodeURIComponent(e.name || e.id) + '=' + encodeURIComponent(v);
+            query += encodeURIComponent(e.name || e.id) + '=' + encodeURIComponent(v);
         }
 
-        var get = !form.method || 'get' === form.method.toLowerCase();
-        if (get) {
-            action = action.replace(/\?.*$/, '') + '?' + data;
-            data = null;
+        if (!this.method || 'get' === this.method.toLowerCase()) {
+            opts.url = opts.url.replace(/\?.*$/, '') + '?' + query;
+        } else {
+            opts.post = query;
         }
 
-        load(element, action, data, excludeLayout);
-
-        if (get && (!actionAttr || '#' !== actionAttr[0])) {
-            if (w.history && w.history.pushState) {
-                history.pushState({
-                    jasine: {
-                        url: action,
-                        element: elementQuery,
-                        excludeLayout: excludeLayout
-                    }
-                }, document.title, action);
-            }
-        }
+        return load(opts);
     }
 
-    function load(element, url, postData, excludeLayout) {
+    function elementOpts(target) {
+        var opts = {};
+        var isForm = 'form' === target.tagName.toLowerCase();
+        var urlAttrName = (isForm ? 'action' : 'href');
+        opts.url = target.getAttribute(urlAttrName);
+        if (!opts.url && isForm) {
+            opts.url = location.toString();
+        }
+        opts.dataUrl = target.getAttribute('data-' + urlAttrName);
+        opts.element = target.getAttribute('data-element');
+        opts.excludeLayout = target.getAttribute('data-exclude-layout');
+        return opts;
+    }
+
+    function load(opts) {
         var a = document.createElement('a');
-        a.href = url;
+        a.href = opts.dataUrl || opts.url;
+        if (!a.href) {
+            return false;
+        }
         var path = a.pathname.substr(1);
         if (path.match(/(^$|\/$)/)) {
             path += 'index';
             a.pathname += 'index';
         }
         a.pathname += '.json';
+
+        var element = document.querySelector(
+            opts.element || (opts.url && '#' === opts.url[0] ? opts.url : options.element)
+        );
+        if (!element) {
+            return false;
+        }
+
         fire(element, 'elementbeforeload', true, true);
-        request(a.href, postData, function(err, req) {
+
+        request(a.href, opts.post, function(err, req) {
             if (err) {
-                fire(element, 'elementloaderror', true, true, {
-                    request: req,
-                    error: err
-                });
+                fire(element, 'elementloaderror', true, true, {request: req, error: err});
             } else {
                 var data = JSON.parse(req.responseText);
+
+                var excludeLayout = opts.excludeLayout || options.excludeLayout;
                 if (excludeLayout) {
                     if (!data.excludeLayout) {
                         data.excludeLayout = [];
@@ -171,15 +156,35 @@
 
                 element.innerHTML = jsin.include(data.template || path, data);
                 initElement(element);
+
+                if (!opts.post && opts.url && '#' !== opts.url[0]) {
+                    if (w.history && w.history.pushState) {
+                        history.pushState(opts, document.title, opts.url);
+                    }
+                }
+
                 fire(element, 'elementload', true, true, {request: req});
             }
         });
+
+        return true;
     }
 
-    function request(url, postData, callback) {
-        if ('function' === typeof postData) {
-            callback = postData;
-            postData = null;
+    function fire(target, event, bubbles, cancelable, opts) {
+        var evt = document.createEvent('Event');
+        evt.initEvent(event, bubbles, cancelable);
+        if (opts) {
+            for (var i in opts) {
+                evt[i] = opts[i];
+            }
+        }
+        target.dispatchEvent(evt);
+    }
+
+    function request(url, post, callback) {
+        if ('function' === typeof post) {
+            callback = post;
+            post = null;
         }
 
         var req = new XMLHttpRequest();
@@ -196,24 +201,13 @@
                 callback(err, req);
             }
         };
-        if (postData) {
+        if (post) {
             req.open('POST', url, true);
-            req.send(postData);
+            req.send(post);
         } else {
             req.open('GET', url, true);
             req.send();
         }
-    }
-
-    function fire(target, event, bubbles, cancelable, opts) {
-        var evt = document.createEvent('Event');
-        evt.initEvent(event, bubbles, cancelable);
-        if (opts) {
-            for (var i in opts) {
-                evt[i] = opts[i];
-            }
-        }
-        target.dispatchEvent(evt);
     }
 
 })(window);
