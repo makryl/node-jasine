@@ -17,8 +17,8 @@ var config = {
     "port":             8008,
     "socket":           null, // UNIX socket instead of host and port
     "workers":          null, // Default: count of CPUs
-    "group":            null, // Default: nobody
-    "user":             null, // Default: nobody
+    "group":            null, // Default: nobody. Works under root only.
+    "user":             null, // Default: nobody. Works under root only.
     "daemon":           false, // In most cases you should set it to TRUE, don't forget to set "pid" and "log" also
     "pid":              null, // Required for stop, reload and kill commands
     "log":              null,
