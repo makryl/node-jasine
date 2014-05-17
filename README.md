@@ -2,19 +2,74 @@
 
 Router for Node.js's HTTP(S) server, calls JS controller and [JSIN](https://github.com/Aequiternus/node-jsin) template using URL.
 
+## Basic
+
+Install:
+
     $ npm install jasine
-    $ ./node_modules/.bin/jasine [config.json]
 
-or
+Start test server (examples in `node_modules/jasine/test` directory):
 
-    $ sudo npm install -g jasine
-    $ jasine [config.json]
+    $ npm test jasine
+
+To stop test server use `Ctrl+C`.
+
+Live example, where I'm using and testing Jasine server at the moment: [kawaiinyan.com](http://kawaiinyan.com/).
+
+Start server:
+
+    $ node node_modules/jasine/server config.json
+
+Stop server:
+
+    $ node node_modules/jasine/server config.json stop
+
+Graceful reload server:
+
+    $ node node_modules/jasine/server config.json reload
+
+Kill server:
+
+    $ node node_modules/jasine/server config.json kill
+
+Default config:
+
+    {
+        // Server settings
+        "protocol":         "http", // http or https
+        "host":             "localhost",
+        "port":             8008,
+        "socket":           null, // UNIX socket instead of host and port
+        "workers":          null, // Default: count of CPUs
+        "group":            null, // Default: nobody
+        "user":             null, // Default: nobody
+        "daemon":           false, // In most cases you should set it to TRUE, don't forget to set "pid" and "log" also
+        "pid":              null, // Required for stop, reload and kill commands
+        "log":              null,
+        "logError":         null, // Default: same as "log"
+
+        // Router settings
+        "logLevel":         "info", // debug, info, warn, error
+        "init":             null, // Module required before server starts (main application module)
+        "error":            __dirname + "/public/", // Universal controller for all errors
+        // Use errorXXX for specified error code.
+        // Example: "error404": "/path/to/error404" will look for /path/to/error404.js and/or /path/to/error404.jsin.
+        "dirRoot":          __dirname, // Should be overridden
+        "dirPublic":        "public", // Where controllers and templates located
+        "dirStatic":        "static", // Where static files located
+        "uriStatic":        "/static/", // URL prefix for static files
+        "mimeDefault":      "text/html",
+        "mimeJSON":         "text/json",
+        "charset":          "utf-8"
+    }
+
+## Server side
 
 When you open any URL, Jasine first looks for `.js` file with same path in public directory:
 
-    http://localhost:8008/boo  -> public_dir/boo.js
-    http://localhost:8008/boo/ -> public_dir/boo/index.js
-    http://localhost:8008/     -> public_dir/index.js
+    http://localhost:8008/boo  -> public/boo.js
+    http://localhost:8008/boo/ -> public/boo/index.js
+    http://localhost:8008/     -> public/index.js
 
 This `.js` file should be node module exporting one function:
 
@@ -35,6 +90,10 @@ You can pass HTTP error code (404, 403, etc) to first argument of this function,
     // or
     throw 404;
 
+Also you can set `statusCode` of `response`:
+
+    response.statusCode = 404;
+
 Data object, passed in callback, will be passed to [JSIN](https://github.com/Aequiternus/node-jsin) template at same file path, but `.jsin` extension.
 
 You can override template using property `template` of data object:
@@ -45,46 +104,31 @@ You can override template using property `template` of data object:
         foo: "fooooo"
     });
 
-Next, Jasine will try to load `index` module in same directory and call exported method with name equal to basename of URL.
+If `.js` file was not found at requested path in public dir, next, Jasine will try to load `index` module in same directory and call exported method with name equal to basename of URL.
 
-For example URL `http://localhost:8008/boo`: if module `public_dir/boo.js` not found, Jasine will try to call method `boo` of module `public_dir/index.js`:
+For example URL `http://localhost:8008/boo`: if module `public/boo.js` not found, Jasine will try to call method `boo` of module `public/index.js`:
 
-    // public_dir/index.js
+    // public/index.js
     module.exports.index = function(request, response, callback) {...}
     module.exports.boo = function(request, response, callback) {...}
 
-If method was not found, next, Jasine will look for `.jsin` file at same path (`public_dir/boo.jsin`), and call it without data.
+If method was not found, next, Jasine will look for `router` method in `index` module and call this method with basename of URL as additional argument.
 
-If you open URL ending with `.json` extension, Jasine will look for `.js` module or appropriate method in `index.js`, and response generated data as JSON, without using [JSIN](https://github.com/Aequiternus/node-jsin) template.
+For example URL `http://localhost:8008/boo`: if module `public/boo.js` not found, method `boo` in `public/index.js` not found also, Jasine will try to call method `router` of module `public/index.js`:
 
-    http://localhost:8008/boo.json -> public_dir/boo.js or method boo in public_dir/index.js
-
-Default config:
-
-    {
-        "protocol":         "http",
-        "host":             "localhost",
-        "port":             8008,
-        "socket":           null,
-        "logLevel":         "info",
-        "error":            __dirname + "/public/",
-        "dirPublic":        __dirname + "/public",
-        "dirStatic":        __dirname + "/static",
-        "uriStatic":        "/static/",
-        "mimeDefault":      "text/html",
-        "mimeJSON":         "text/json",
-        "charset":          "utf-8",
-        "maxPostSize":      1e6
+    // public/index.js
+    module.exports.router = function(request, response, basename, callback) {
+        // basename == 'boo'
+        ...
     }
 
-- `protocol`: `http`, `https`.
-- `dirPublic`: where controllers/templates located. Should be overwritten.
-- `uriStatic`: URL prefix for static files. To disable processing of static files set it to `null`. Will load files from `dirStatic` directory.
-- `logLevel`: `debug`, `info`, `warn`, `error`.
-- `error`: universal controller for all errors.
-    Ending `/` means `/index` like in URL.
-- `errorXXX`: controller/template for specified error code.
-    Example: `"error404": "/path/to/error404"` will look for `/path/to/error404.js` and/or `/path/to/error404.jsin`.
+If method was not found, next, Jasine will look for `.jsin` file at same path (`public/boo.jsin`), and call it without data.
+
+If you open URL ending with `.json` extension, Jasine will look for `.js` module or appropriate method in the same way as explained above, and response generated data as JSON, without using [JSIN](https://github.com/Aequiternus/node-jsin) template.
+
+    http://localhost:8008/boo.json -> public/boo.js or method boo in public/index.js
+
+## Client side
 
 To make AJAX requests, include compiled [JSIN](https://github.com/Aequiternus/node-jsin) templates and client side script `jasine.js` on html page. Call `jasine.init` at the end of body, or in window `onload` handler.
 
@@ -106,7 +150,7 @@ To make AJAX requests, include compiled [JSIN](https://github.com/Aequiternus/no
         </body>
     </html>
 
-By default all ajax requests attached to `body` element and excludes layout with name `layout`. You can set defaults, passing object with `element` and `excludeLayout` properties as argument to `jasine.init` method.
+By default all AJAX requests attached to `body` element and excludes layout with name `layout`. You can set defaults, passing object with `element` and `excludeLayout` properties as argument to `jasine.init` method. URI for static files (by default `/static/`) ignored by Jasine, you can change default using property `uriStatic`.
 
     <!doctype html>
     <html>
@@ -128,7 +172,8 @@ By default all ajax requests attached to `body` element and excludes layout with
                     excludeLayout: [
                         "myMainLayout",
                         "layouts/additionalMainLayout"
-                    ]
+                    ],
+                    uriStatic: "/my_static/"
                 });
             </script>
         </body>
@@ -173,13 +218,34 @@ Init method adds `onclick` handler to all `a` with `href` starting with `/` and 
 
 Clicking `a` with `href` starting with `/` will change history state for "back" button in browser. Clicking elements without `href` or `href` starting with `#` will not change history state. Method `jasine.init` adds `popstate` event listener of `window` to handle history "back" and "forward".
 
-AJAX forms works in same manner as links, but with `action` and `data-action` attributes instead of `href` and `data-href`. At the moment AJAX forms works only with `application/x-www-form-urlencoded`. Forms with method `get` will change history state if `action` starts with `/`. Forms with method `post` or `action` starting with `#` will not change history state.
+AJAX forms works in same manner as links, but with `action` and `data-action` attributes instead of `href` and `data-href`. AJAX forms supports next `enctype`: `application/x-www-form-urlencoded`, `multipart/form-data` (with file upload support) and `text/json`. Forms with method `get` will change history state if `action` starts with `/`. Forms with method `post` or `action` starting with `#` will not change history state.
 
-Examples in `test` directory. To start test server run command:
+You can make AJAX request using method `jasine.load`. This method has one argument - options object:
 
-    $ npm test jasine
+    jasine.load({
+        url: '/any_url', // same as "href" or "action"
+        dataUrl: '/any_url', // same as "data-href" or "data-action"
+        element: '#any-element', // same as "data-element"
+        excludeLayout: 'layoutToExclude', // array or string: layouts to exclude, same as "data-exclude-layout"
+        post: 'post data', // post data
+        postType: 'mime/type', // mime type of post data
+        onelementbeforeload: function(event){}, // event listener for "elementbeforeload"
+        onelementload: function(event){}, // event listener for "elementload"
+        onelementafterload: function(event){} // event listener for "elementafterload"
+    });
 
-It will prepare test templates and start test server at `http://localhost:8008/`.
+Jasine AJAX requests has three events:
+
+- `elementbeforeload` - fires before request.
+- `elementload` - fires after response received and before HTML and history were changed.
+- `elementafterload` - fires after response received and HTML and history were changed.
+
+These events has additional properties:
+
+- `options` - Jasine options of request.
+- `request` - current `XMLHttpRequest`.
+- `data` - received JSON.
+- `error` - error occurred during request.
 
 ## License
 

@@ -1,4 +1,4 @@
-/* Compiled with jsinc v 0.1.10 */
+/* Compiled with jsinc v 0.1.12 */
 (function(w){
 
 if (!w.jsin) w.jsin = {compiled: {}};
@@ -42,15 +42,15 @@ layout('layout', function(){;
 print("\n<h1>Test form</h1>\n\n<h2>Method <code>GET</code></h2>\n<form>\n    <label>\n        My input\n        <input type=\"text\" name=\"mygetinput\" value=\"");
 printh(mygetinput);
 print("\">\n    </label>\n    <label>\n        <input type=\"checkbox\" name=\"mycheckbox\"");
-if (mycheckbox) print("checked");
+if (mycheckbox) print(" checked");
 print(">\n        My checkbox\n    </label>\n    <label>\n        <input type=\"radio\" name=\"myradio\" value=\"1\"");
-if (myradio == 1) print("checked");
+if (myradio == 1) print(" checked");
 print(">\n        My radio 1\n    </label>\n    <label>\n        <input type=\"radio\" name=\"myradio\" value=\"2\"");
-if (myradio == 2) print("checked");
+if (myradio == 2) print(" checked");
 print(">\n        My radio 2\n    </label>\n    <label>\n        My select\n        <select name=\"myselect\">\n            <option value=\"1\"");
-if (myselect == 1) print("selected");
+if (myselect == 1) print(" selected");
 print(">option 1</option>\n            <option value=\"2\"");
-if (myselect == 2) print("selected");
+if (myselect == 2) print(" selected");
 print(">option 2</option>\n        </select>\n    </label>\n    <label>\n        My textarea\n        <textarea name=\"mytextarea\">");
 printh(mytextarea);
 print("</textarea>\n    </label>\n    <p>\n        <input type=\"submit\" name=\"mysubmit\">\n        <input type=\"reset\">\n");
@@ -96,9 +96,9 @@ print("</code></pre>\n\n\n");
 
 w.jsin.compiled['layout'] = function() {
 with(this){with(__data){
-print("<!doctype html>\n<html>\n<head>\n    <title>Test</title>\n    <meta charset=\"utf-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <link rel=\"stylesheet\" href=\"/static/adefault-light.min.css\">\n    <link rel=\"stylesheet\" href=\"/static/main.css\">\n    <link rel=\"stylesheet\" href=\"//yandex.st/highlightjs/8.0/styles/googlecode.min.css\">\n</head>\n<body>\n\n    <nav>\n        <strong>Jasine test server</strong>\n        <a href=\"/\">main</a>\n        <a href=\"/form\">form</a>\n        <a href=\"/foo\">foo</a>\n        <a href=\"/boo/\">boo index</a>\n        <a href=\"/boo/index-check\">boo index-check</a>\n        <a href=\"/error\">error</a>\n    </nav>\n\n    <section>\n");
+print("<!doctype html>\n<html>\n<head>\n    <title>Test</title>\n    <meta charset=\"utf-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <link rel=\"stylesheet\" href=\"/static/adefault-light.min.css\">\n    <link rel=\"stylesheet\" href=\"/static/main.css\">\n    <link rel=\"stylesheet\" href=\"//yandex.st/highlightjs/8.0/styles/googlecode.min.css\">\n</head>\n<body>\n\n    <nav>\n        <strong>Jasine test server</strong>\n        <a href=\"/\">main</a>\n        <a href=\"/form\">form</a>\n        <a href=\"/foo\">foo</a>\n        <a href=\"/boo/\">boo index</a>\n        <a href=\"/boo/index-check\">boo index-check</a>\n        <a href=\"/boo/index-router-check\">boo index-router-check</a>\n        <a href=\"/error\">error</a>\n    </nav>\n\n    <section>\n");
 contents();
-print("    </section>\n\n<!-- Jasine -->\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init({\n        element: 'section'\n    });\n</script>\n\n<!-- Highlight.js -->\n<script src=\"//yandex.st/highlightjs/8.0/highlight.min.js\"></script>\n<script>\n    hljs.initHighlightingOnLoad();\n\n    addEventListener('elementload', function(e) {\n        var blocks = e.target.querySelectorAll('pre code');\n        Array.prototype.forEach.call(blocks, hljs.highlightBlock);\n    }, false);\n</script>\n\n</body>\n</html>\n");
+print("    </section>\n\n<!-- Jasine -->\n<script src=\"/static/jsin.compiled.js\"></script>\n<script src=\"/static/jasine.js\"></script>\n<script>\n    jasine.init({\n        element: 'section'\n    });\n</script>\n\n<!-- Highlight.js -->\n<script src=\"//yandex.st/highlightjs/8.0/highlight.min.js\"></script>\n<script>\n    hljs.initHighlightingOnLoad();\n\n    addEventListener('elementafterload', function(e) {\n        var blocks = e.target.querySelectorAll('pre code');\n        Array.prototype.forEach.call(blocks, hljs.highlightBlock);\n    }, false);\n</script>\n\n</body>\n</html>\n");
 }}
 };
 
@@ -165,12 +165,29 @@ var ehs = {
     '"': '&quot;'
 };
 
+var ehas = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;'
+};
+
 function eh(s) {
     return ehs[s] || s;
 }
 
-context.prototype.printh = function(string) {
-    this.print(string.replace(/[&<>"]/g, eh));
+function eha(s) {
+    return ehas[s] || s;
+}
+
+context.prototype.printh = function(string, apos) {
+    if ('undefined' !== typeof string) {
+        if (apos) {
+            this.print(string.replace(/[&<>']/g, eha));
+        } else {
+            this.print(string.replace(/[&<>"]/g, eh));
+        }
+    }
 };
 
 var ess = {
@@ -186,7 +203,9 @@ function es(s) {
 }
 
 context.prototype.prints = function(string) {
-    this.print(string.replace(/[\\\n\r"']/g, es));
+    if ('undefined' !== typeof string) {
+        this.print(string.replace(/[\\\n\r"']/g, es));
+    }
 }
 
 context.prototype.include = function(template, data) {

@@ -22,7 +22,7 @@ logger.prototype.log = function(level, reqId, message) {
     if (this.levels[level] <= this.level) {
         console[level === "debug" ? "error" : level](
             "%s [%d] [%s] %s",
-            (new Date()).toString(),
+            (new Date()).toISOString(),
             reqId || 0,
             level,
             message

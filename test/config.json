@@ -1,5 +1,4 @@
 {
-    "dirPublic": "test/public",
-    "dirStatic": "test/static",
+    "dirRoot": "test",
     "logLevel": "debug"
 }

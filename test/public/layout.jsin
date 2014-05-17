@@ -18,6 +18,7 @@
         <a href="/foo">foo</a>
         <a href="/boo/">boo index</a>
         <a href="/boo/index-check">boo index-check</a>
+        <a href="/boo/index-router-check">boo index-router-check</a>
         <a href="/error">error</a>
     </nav>
 
@@ -39,7 +40,7 @@
 <script>
     hljs.initHighlightingOnLoad();
 
-    addEventListener('elementload', function(e) {
+    addEventListener('elementafterload', function(e) {
         var blocks = e.target.querySelectorAll('pre code');
         Array.prototype.forEach.call(blocks, hljs.highlightBlock);
     }, false);

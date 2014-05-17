@@ -6,48 +6,75 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-module.exports = create;
-
 var fs = require('fs');
 var http = require('http');
 var url = require('url');
 var jsin = require('jsin');
 var mime;
 
-var logger;
+exports.create = create;
+exports.logger = logger;
+exports.jsin = jsin;
+
+var log;
 var REQID = 0;
 
-var config = {
-    logLevel:           "info",
-    error:              __dirname + "/public/",
-    dirPublic:          __dirname + "/public",
-    dirStatic:          __dirname + "/static",
-    uriStatic:          "/static/",
-    mimeDefault:        "text/html",
-    mimeJSON:           "text/json",
-    charset:            "utf-8"
+var config = exports.config = {
+    "logLevel":         "info", // debug, info, warn, error
+    "init":             null, // Module required before server starts (main application module)
+    "error":            __dirname + "/public/", // Universal controller for all errors
+    // Use errorXXX for specified error code.
+    // Example: "error404": "/path/to/error404" will look for /path/to/error404.js and/or /path/to/error404.jsin.
+    "dirRoot":          __dirname, // Should be overridden
+    "dirPublic":        "public", // Where controllers and templates located
+    "dirStatic":        "static", // Where static files located
+    "uriStatic":        "/static/", // URL prefix for static files
+    "mimeDefault":      "text/html",
+    "mimeJSON":         "text/json",
+    "charset":          "utf-8"
 };
 
 function create(cfg) {
     if (cfg) {
         for (var name in cfg) {
-            if (name.match(/^(dir|error)/) && !cfg[name].match(/^\.?\//)) {
-                cfg[name] = process.cwd() + '/' + cfg[name];
-            }
             config[name] = cfg[name];
         }
+    }
+
+    if (!config.dirRoot) {
+        config.dirRoot = process.cwd();
+    } else if (!config.dirRoot.match(/^\.?\//)) {
+        config.dirRoot = process.cwd() + '/' + config.dirRoot;
+    }
+    process.chdir(config.dirRoot);
+
+    for (var name in config) {
+        if (name.match(/^(dirPublic$|dirStatic$|error)/) && !config[name].match(/^\.?\//)) {
+            config[name] = config.dirRoot + '/' + config[name];
+        }
+    }
+
+    log = new (require('./logger'))(config.logLevel);
+
+    if (config.init) {
+        if (!config.init.match(/^\.?\//)) {
+            config.init = config.dirRoot + '/' + config.init;
+        }
+        require(config.init);
     }
 
     if (config.uriStatic) {
         mime = require('mime');
     }
 
-    logger = new (require('./logger'))(config.logLevel);
-
     jsin.setDirectory(config.dirPublic);
     jsin.clear();
 
     return router;
+}
+
+function logger() {
+    return log;
 }
 
 function router(req, res) {
@@ -85,12 +112,12 @@ function controller(req, res, path, json) {
     if (path.match(/(^$|\/$)/)) {
         path += 'index';
     }
-    logger.debug(req.__id, "Path: " + path);
+    log.debug(req.__id, "Path: " + path);
 
     function controllerCallback(err, data) {
         try {
             if (err) throw err;
-            logger.debug(req.__id, "Data received");
+            log.debug(req.__id, "Data received");
             if (json) {
                 outputJSON(req, res, data);
             } else {
@@ -119,33 +146,37 @@ function controller(req, res, path, json) {
     var baseName = fullPath.substr(p);
 
     try {
-        var module = require(fullPath);
-        logger.debug(req.__id, "Module: " + fullPath);
+        var module = require(fullPath + '.js');
+        log.debug(req.__id, "Module: " + fullPath);
         if ('function' === typeof module) {
             module(req, res, controllerCallback);
         } else if ('index' === baseName && module.index) {
-            logger.debug(req.__id, "Method: index");
+            log.debug(req.__id, "Method: index");
             module.index(req, res, controllerCallback);
         } else {
-            logger.debug(req.__id, "Method nod found");
+            log.debug(req.__id, "Method nod found: index");
             noController();
         }
     } catch (err) {
         if ('MODULE_NOT_FOUND' === err.code && -1 !== err.message.indexOf(fullPath)) {
+            log.debug(req.__id, "Module not found: " + fullPath);
             fullPath = dirName + 'index';
             try {
-                var module = require(fullPath);
-                logger.debug(req.__id, "Module: " + fullPath);
+                var module = require(fullPath + '.js');
+                log.debug(req.__id, "Module: " + fullPath);
                 if (module[baseName]) {
-                    logger.debug(req.__id, "Method: " + baseName);
+                    log.debug(req.__id, "Method: " + baseName);
                     module[baseName](req, res, controllerCallback);
+                } else if (module.router) {
+                    log.debug(req.__id, "Module router");
+                    module.router(req, res, baseName, controllerCallback);
                 } else {
-                    logger.debug(req.__id, "Method nod found");
+                    log.debug(req.__id, "Method nod found: " + baseName);
                     noController();
                 }
             } catch (err) {
                 if ('MODULE_NOT_FOUND' === err.code && -1 !== err.message.indexOf(fullPath)) {
-                    logger.debug(req.__id, "Module not found");
+                    log.debug(req.__id, "Module not found: " + fullPath);
                     noController();
                 } else {
                     throw err;
@@ -176,7 +207,7 @@ function error(req, res, err, code, level) {
         }
     }
 
-    logger.log(level, req.__id, code + ' ' + remoteAddress(req) + ' ' + req.url + ' ' + err);
+    log.log(level, req.__id, code + ' ' + remoteAddress(req) + ' ' + req.url + ' ' + err);
 
     res.statusCode = code;
     if (!res.headersSent) {
@@ -203,7 +234,7 @@ function notFound(req, res) {
 }
 
 function template(req, res, path, data) {
-    logger.debug(req.__id, "JSIN: " + path);
+    log.debug(req.__id, "JSIN: " + path);
     jsin.include(path, data || {}, function(err, out) {
         if (err) {
             if ('ENOENT' !== err.code || -1 === err.message.indexOf(path)) {
@@ -219,21 +250,21 @@ function template(req, res, path, data) {
 
 function outputJSON(req, res, data) {
     res.end(JSON.stringify(data));
-    logger.debug(req.__id, "JSON output");
-    logger.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
+    log.debug(req.__id, "JSON output");
+    log.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
 }
 
 function outputJSIN(req, res, out) {
     res.end(out);
     if (!res.__hasError) {
-        logger.debug(req.__id, "JSIN output");
-        logger.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
+        log.debug(req.__id, "JSIN output");
+        log.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
     }
 }
 
 function static(req, res, path) {
     path = config.dirStatic + '/' + path;
-    logger.debug(req.__id, "Static: " + path);
+    log.debug(req.__id, "Static: " + path);
     fs.stat(path, function(err, stats) {
         if (err) {
             if ('ENOENT' !== err.code || -1 === err.message.indexOf(path)) {
@@ -252,8 +283,8 @@ function static(req, res, path) {
 
             fs.createReadStream(path).pipe(res);
 
-            logger.debug(req.__id, 'Static output: ' + stats.size + ' ' + ct);
-            logger.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
+            log.debug(req.__id, 'Static output: ' + stats.size + ' ' + ct);
+            log.info(req.__id, res.statusCode + ' ' + remoteAddress(req) + ' ' + req.url);
         }
     });
 }
